@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { ShoppingCart, User, Phone, FileText, MapPin, Building2 } from 'lucide-react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import DownloadPage from './DownloadPage';
 
-function OrderForm() {
+function App() {
   const [formData, setFormData] = useState({
     Customer_Name: '',
     Mobile_No: '',
@@ -318,17 +316,6 @@ function OrderForm() {
         </div>
       </div>
     </div>
-  );
-}
-
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<OrderForm />} />
-        <Route path="/download" element={<DownloadPage />} />
-      </Routes>
-    </Router>
   );
 }
 
