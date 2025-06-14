@@ -16,7 +16,7 @@ function DownloadPage() {
 
   const handleDownload = async () => {
     try {
-      const response = await fetch('http://localhost:3001/download');
+      const response = await fetch('/download');
       if (!response.ok) {
         throw new Error('فشل تحميل الملف');
       }
