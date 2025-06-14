@@ -77,7 +77,7 @@ function App() {
         Total_Weight: formData.totalWeight
       };
 
-      const response = await fetch('http://localhost:3001/add-order', {
+      const response = await fetch('/api/add-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ function App() {
 
   const handleDownload = async () => {
     try {
-      const response = await fetch('http://localhost:3001/download');
+      const response = await fetch('/api/download');
       if (!response.ok) {
         throw new Error('فشل تحميل الملف');
       }
