@@ -66,7 +66,7 @@ app.get('/orders', (req, res) => {
 });
 
 // Add order endpoint
-app.post('/add-order', (req, res) => {
+app.post('/api/add-order', (req, res) => {
   try {
     const { Customer_Name, Mobile_No, Description, Street, City, Alternative_Contact, totalWeight, Item_Special_Notes } = req.body;
 
