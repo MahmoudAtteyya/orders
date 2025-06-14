@@ -107,7 +107,7 @@ app.post('/add-order', (req, res) => {
 });
 
 // Download orders endpoint
-app.get('/download', async (req, res) => {
+app.get('/api/download', async (req, res) => {
   try {
     if (orders.length === 0) {
       return res.status(404).json({ error: 'No orders to download' });
@@ -167,8 +167,11 @@ app.get('/download', async (req, res) => {
   }
 });
 
+// Handle API routes first
+app.use('/api', express.Router());
+
 // Send index.html for all other routes (SPA support)
-app.get('/*', (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 

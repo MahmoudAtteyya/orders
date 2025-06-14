@@ -16,7 +16,7 @@ function DownloadPage() {
 
   const handleDownload = async () => {
     try {
-      const response = await fetch('/download');
+      const response = await fetch('/api/download');
       if (!response.ok) {
         throw new Error('فشل تحميل الملف');
       }
