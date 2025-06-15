@@ -313,11 +313,48 @@ function App() {
           <div className="flex items-center gap-2">
             <span className="font-bold text-purple-700">Elliaa</span>
             <span className="text-gray-400">|</span>
-            <span className="mx-1 animate-pulse text-red-500 text-xl">❤</span>
+            {/* Animated SVG Heart */}
+            <span className="inline-block">
+              <svg
+                className="w-6 h-6 animate-beat-heart drop-shadow-lg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <radialGradient id="heartGradient" cx="50%" cy="50%" r="80%">
+                    <stop offset="0%" stopColor="#f472b6" />
+                    <stop offset="100%" stopColor="#be185d" />
+                  </radialGradient>
+                </defs>
+                <path
+                  d="M12 21s-6.5-5.2-8.5-8.1C1.1 10.1 2.2 6.6 5.6 5.4c2.1-.7 4.1.2 5.4 1.7C12.3 5.6 14.3 4.7 16.4 5.4c3.4 1.2 4.5 4.7 2.1 7.5C18.5 15.8 12 21 12 21z"
+                  fill="url(#heartGradient)"
+                  stroke="#be185d"
+                  strokeWidth="0.7"
+                  style={{ filter: 'drop-shadow(0 0 4px #f472b6)' }}
+                />
+              </svg>
+            </span>
             <span>Made with</span>
           </div>
           <div className="text-xs text-gray-400 mt-1">All rights reserved © {new Date().getFullYear()}</div>
         </footer>
+        <style>{`
+          @keyframes beat-heart {
+            0%, 100% { transform: scale(1); }
+            10% { transform: scale(1.15); }
+            20% { transform: scale(0.95); }
+            30% { transform: scale(1.1); }
+            50% { transform: scale(0.97); }
+            70% { transform: scale(1.12); }
+            80% { transform: scale(0.98); }
+          }
+          .animate-beat-heart {
+            animation: beat-heart 1.2s infinite cubic-bezier(.4,0,.6,1);
+            transition: filter 0.2s;
+          }
+        `}</style>
       </div>
     </div>
   );
