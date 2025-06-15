@@ -309,11 +309,11 @@ function App() {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-gray-500 text-sm">
-            جميع البيانات محمية ومشفرة
-          </p>
-        </div>
+        <footer className="mt-12 flex justify-center items-center text-gray-500 text-sm select-none">
+          Made with
+          <span className="mx-1 animate-pulse text-red-500 text-xl">❤</span>
+          by <span className="font-bold text-purple-700 ml-1">Elliaa</span>
+        </footer>
       </div>
     </div>
   );
