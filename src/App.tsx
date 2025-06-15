@@ -337,24 +337,18 @@ function App() {
           <div className="flex items-center gap-2">
             <span className="font-bold text-purple-700">Elliaa</span>
             <span className="text-gray-400">|</span>
-            {/* Animated SVG Heart - burgundy color, improved shape & animation */}
+            {/* Animated SVG Heart - smaller, new color */}
             <span className="inline-block">
               <svg
-                className="w-7 h-7 animate-heartbeat drop-shadow-lg"
+                className="w-5 h-5 animate-heartbeat drop-shadow-lg"
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <defs>
-                  <radialGradient id="heartGradient2" cx="50%" cy="50%" r="80%">
-                    <stop offset="0%" stopColor="#a8324a" />
-                    <stop offset="100%" stopColor="#7b1e2e" />
-                  </radialGradient>
-                </defs>
                 <path
                   d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                  fill="url(#heartGradient2)"
-                  stroke="#7b1e2e"
+                  fill="#6a1b9a"
+                  stroke="#6a1b9a"
                   strokeWidth="1"
                 />
               </svg>
