@@ -309,10 +309,14 @@ function App() {
         </div>
 
         {/* Footer */}
-        <footer className="mt-12 flex justify-center items-center text-gray-500 text-sm select-none">
-          Made with
-          <span className="mx-1 animate-pulse text-red-500 text-xl">❤</span>
-          by <span className="font-bold text-purple-700 ml-1">Elliaa</span>
+        <footer className="mt-16 flex flex-col items-center justify-center text-gray-500 text-sm select-none">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-purple-700">Elliaa</span>
+            <span className="text-gray-400">|</span>
+            <span>Made with</span>
+            <span className="mx-1 animate-pulse text-red-500 text-xl">❤</span>
+          </div>
+          <div className="text-xs text-gray-400 mt-1">All rights reserved © {new Date().getFullYear()}</div>
         </footer>
       </div>
     </div>
