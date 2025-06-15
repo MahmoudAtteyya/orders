@@ -44,6 +44,18 @@ const orderSchema = new mongoose.Schema({
 });
 const Order = mongoose.model('Order', orderSchema);
 
+// نموذج إحصائيات الطلبات
+const statsSchema = new mongoose.Schema({
+  dailyCount: { type: Number, default: 0 },
+  dailyDate: { type: String }, // yyyy-mm-dd
+  monthlyCount: { type: Number, default: 0 },
+  monthlyMonth: { type: String }, // yyyy-mm
+  yearlyCount: { type: Number, default: 0 },
+  yearlyYear: { type: String }, // yyyy
+  totalCount: { type: Number, default: 0 }
+});
+const Stats = mongoose.model('Stats', statsSchema);
+
 // In-memory storage for orders
 let orders = [];
 let downloadCounter = 1;
@@ -103,20 +115,69 @@ downloadCounter = 1;
 saveCounter();
 loadOrders();
 
-// Function to clear orders array
-function clearOrders() {
-  orders = [];
-  console.log('Orders array cleared');
+// دالة تحديث الإحصائيات عند إضافة طلب جديد
+async function updateStatsOnNewOrder() {
+  const now = new Date();
+  const today = now.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }); // yyyy-mm-dd
+  const month = today.slice(0, 7); // yyyy-mm
+  const year = today.slice(0, 4); // yyyy
+  let stats = await Stats.findOne();
+  if (!stats) {
+    stats = new Stats({
+      dailyCount: 1,
+      dailyDate: today,
+      monthlyCount: 1,
+      monthlyMonth: month,
+      yearlyCount: 1,
+      yearlyYear: year,
+      totalCount: 1
+    });
+  } else {
+    // Reset daily if needed
+    if (stats.dailyDate !== today) {
+      stats.dailyCount = 1;
+      stats.dailyDate = today;
+    } else {
+      stats.dailyCount++;
+    }
+    // Reset monthly if needed
+    if (stats.monthlyMonth !== month) {
+      stats.monthlyCount = 1;
+      stats.monthlyMonth = month;
+    } else {
+      stats.monthlyCount++;
+    }
+    // Reset yearly if needed
+    if (stats.yearlyYear !== year) {
+      stats.yearlyCount = 1;
+      stats.yearlyYear = year;
+    } else {
+      stats.yearlyCount++;
+    }
+    // Total always increases
+    stats.totalCount++;
+  }
+  await stats.save();
 }
 
-// Check orders endpoint
-app.get('/orders', async (req, res) => {
-  try {
-    const count = await Order.countDocuments();
-    res.json({ count });
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching orders count' });
+// Endpoint لجلب الإحصائيات
+app.get('/api/order-stats', async (req, res) => {
+  let stats = await Stats.findOne();
+  if (!stats) {
+    // إذا لم توجد إحصائيات، أرجع القيم صفرية
+    return res.json({
+      dailyCount: 0,
+      monthlyCount: 0,
+      yearlyCount: 0,
+      totalCount: 0
+    });
   }
+  res.json({
+    dailyCount: stats.dailyCount,
+    monthlyCount: stats.monthlyCount,
+    yearlyCount: stats.yearlyCount,
+    totalCount: stats.totalCount
+  });
 });
 
 // Add order endpoint
@@ -150,9 +211,7 @@ app.post('/api/add-order', async (req, res) => {
 
     // Add order to database
     await order.save();
-    console.log('Received order:', req.body);
-    console.log('Current orders:', orders);
-
+    await updateStatsOnNewOrder();
     res.json({ message: 'Order added successfully', order });
   } catch (error) {
     console.error('Error adding order:', error);

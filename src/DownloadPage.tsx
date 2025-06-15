@@ -5,6 +5,7 @@ function DownloadPage() {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [ordersCount, setOrdersCount] = useState<number | null>(null);
+  const [stats, setStats] = useState({ dailyCount: 0, monthlyCount: 0, yearlyCount: 0, totalCount: 0 });
 
   // جلب عدد الطلبات من السيرفر
   const fetchOrdersCount = async () => {
@@ -17,8 +18,22 @@ function DownloadPage() {
     }
   };
 
+  // جلب الإحصائيات
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/order-stats');
+      const data = await response.json();
+      setStats(data);
+    } catch {
+      setStats({ dailyCount: 0, monthlyCount: 0, yearlyCount: 0, totalCount: 0 });
+    }
+  };
+
   useEffect(() => {
-    if (isAuthenticated) fetchOrdersCount();
+    if (isAuthenticated) {
+      fetchOrdersCount();
+      fetchStats();
+    }
   }, [isAuthenticated]);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -144,6 +159,26 @@ function DownloadPage() {
               إعادة الضبط
             </span>
           </button>
+        </div>
+
+        {/* إحصائيات الطلبات */}
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow text-center">
+            <div className="text-sm text-gray-500 mb-2">طلبات اليوم</div>
+            <div className="text-3xl font-bold text-purple-700">{stats.dailyCount}</div>
+          </div>
+          <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow text-center">
+            <div className="text-sm text-gray-500 mb-2">طلبات الشهر</div>
+            <div className="text-3xl font-bold text-purple-700">{stats.monthlyCount}</div>
+          </div>
+          <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow text-center">
+            <div className="text-sm text-gray-500 mb-2">طلبات السنة</div>
+            <div className="text-3xl font-bold text-purple-700">{stats.yearlyCount}</div>
+          </div>
+          <div className="bg-white border border-purple-200 rounded-2xl p-6 shadow text-center">
+            <div className="text-sm text-gray-500 mb-2">إجمالي الطلبات</div>
+            <div className="text-3xl font-bold text-purple-700">{stats.totalCount}</div>
+          </div>
         </div>
       </div>
     </div>
