@@ -73,6 +73,7 @@ function DownloadPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="mt-1 block w-full rounded-xl border-gray-200 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  style={{ height: '3.5rem' }} // زيادة الارتفاع للضعف تقريباً
                   required
                 />
               </div>
