@@ -273,6 +273,16 @@ app.post('/api/reset-orders', async (req, res) => {
   }
 });
 
+// يجب أن يكون هذا قبل app.get('*')
+app.get('/orders', async (req, res) => {
+  try {
+    const count = await Order.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching orders count' });
+  }
+});
+
 // Handle API routes first
 app.use('/api', express.Router());
 
