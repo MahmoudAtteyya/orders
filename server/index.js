@@ -4,6 +4,7 @@ import ExcelJS from 'exceljs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import mongoose from 'mongoose';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +18,31 @@ app.use(express.json());
 
 // Serve static files from the React app build directory
 app.use(express.static(path.join(__dirname, '../dist')));
+
+// Connect to MongoDB Atlas
+mongoose.connect('mongodb+srv://mahmoud:Mmm12011305@cluster0.szmfzfx.mongodb.net/ordersdb?retryWrites=true&w=majority', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const orderSchema = new mongoose.Schema({
+  Package_Serial: String,
+  Description: String,
+  Total_Weight: Number,
+  Package_volume: String,
+  COD_Value: String,
+  Item_Special_Notes: String,
+  Customer_Name: String,
+  Mobile_No: String,
+  Street: String,
+  City: String,
+  Package_Ref: String,
+  Merchant_Name: String,
+  Warehouse_Name: String,
+  HasPOD: String,
+  SellerName: String
+});
+const Order = mongoose.model('Order', orderSchema);
 
 // In-memory storage for orders
 let orders = [];
@@ -89,7 +115,7 @@ app.get('/orders', (req, res) => {
 });
 
 // Add order endpoint
-app.post('/api/add-order', (req, res) => {
+app.post('/api/add-order', async (req, res) => {
   try {
     const { Customer_Name, Mobile_No, Description, Street, City, Alternative_Contact, totalWeight, Item_Special_Notes } = req.body;
 
@@ -99,7 +125,7 @@ app.post('/api/add-order', (req, res) => {
     }
 
     // Create order object
-    const order = {
+    const order = new Order({
       Package_Serial: `ORD${Date.now()}`,
       Description,
       Total_Weight: totalWeight,
@@ -115,11 +141,10 @@ app.post('/api/add-order', (req, res) => {
       Warehouse_Name: '',
       HasPOD: '',
       SellerName: ''
-    };
+    });
 
-    // Add order to array
-    orders.push(order);
-    saveOrders();
+    // Add order to database
+    await order.save();
     console.log('Received order:', req.body);
     console.log('Current orders:', orders);
 
@@ -133,6 +158,7 @@ app.post('/api/add-order', (req, res) => {
 // Download orders endpoint
 app.get('/api/download', async (req, res) => {
   try {
+    const orders = await Order.find();
     if (orders.length === 0) {
       return res.status(404).json({ error: 'No orders to download' });
     }
@@ -155,7 +181,7 @@ app.get('/api/download', async (req, res) => {
       { header: 'HasPOD', key: 'HasPOD', width: 10 },
       { header: 'SellerName', key: 'SellerName', width: 20 }
     ];
-    worksheet.addRows(orders);
+    worksheet.addRows(orders.map(order => order.toObject()));
     const fileName = `Orders_${downloadCounter}.xlsx`;
     const filePath = path.join(exportsDir, fileName);
     await workbook.xlsx.writeFile(filePath);
@@ -174,10 +200,13 @@ app.get('/api/download', async (req, res) => {
 });
 
 // Reset orders endpoint
-app.post('/api/reset-orders', (req, res) => {
-  orders = [];
-  saveOrders();
-  res.json({ message: 'Orders have been reset.' });
+app.post('/api/reset-orders', async (req, res) => {
+  try {
+    await Order.deleteMany({});
+    res.json({ message: 'Orders have been reset.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error resetting orders' });
+  }
 });
 
 // Handle API routes first
