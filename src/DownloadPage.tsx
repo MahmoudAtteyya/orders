@@ -22,6 +22,8 @@ function DownloadPage() {
   const [ordersCount, setOrdersCount] = useState<number | null>(null);
   const [stats, setStats] = useState({ dailyCount: 0, monthlyCount: 0, yearlyCount: 0, totalCount: 0 });
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
@@ -92,22 +94,26 @@ function DownloadPage() {
   };
 
   const handleReset = async () => {
-    showToast('هل أنت متأكد أنك تريد مسح جميع الطلبات؟', 'info');
-    setTimeout(async () => {
-      if (!window.confirm('هل أنت متأكد أنك تريد مسح جميع الطلبات؟')) return;
-      try {
-        const response = await fetch('/api/reset-orders', { method: 'POST' });
-        if (!response.ok) {
-          throw new Error('فشل في إعادة الضبط');
-        }
-        await fetchOrdersCount(); // تحديث العدد من السيرفر
-        await fetchStats(); // تحديث الإحصائيات من السيرفر
-        showToast('تم مسح جميع الطلبات بنجاح', 'success');
-      } catch (error) {
-        showToast('حدث خطأ أثناء إعادة الضبط', 'error');
-        console.error('Error:', error);
+    setShowConfirm(true);
+  };
+
+  const confirmReset = async () => {
+    setResetLoading(true);
+    try {
+      const response = await fetch('/api/reset-orders', { method: 'POST' });
+      if (!response.ok) {
+        throw new Error('فشل في إعادة الضبط');
       }
-    }, 500);
+      await fetchOrdersCount(); // تحديث العدد من السيرفر
+      await fetchStats(); // تحديث الإحصائيات من السيرفر
+      showToast('تم مسح جميع الطلبات بنجاح', 'success');
+    } catch (error) {
+      showToast('حدث خطأ أثناء إعادة الضبط', 'error');
+      console.error('Error:', error);
+    } finally {
+      setShowConfirm(false);
+      setResetLoading(false);
+    }
   };
 
   if (!isAuthenticated) {
@@ -258,6 +264,30 @@ function DownloadPage() {
         }
       `}</style>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {/* تأكيد إعادة الضبط */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-xs w-full text-center animate-fade-in">
+            <div className="text-lg font-bold text-gray-800 mb-4">هل أنت متأكد أنك تريد مسح جميع الطلبات؟</div>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={confirmReset}
+                disabled={resetLoading}
+                className="bg-gradient-to-r from-red-600 to-red-800 text-white font-semibold px-6 py-2 rounded-xl shadow hover:from-red-700 hover:to-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-60"
+              >
+                {resetLoading ? 'جاري المسح...' : 'نعم'}
+              </button>
+              <button
+                onClick={() => setShowConfirm(false)}
+                disabled={resetLoading}
+                className="bg-gray-200 text-gray-700 font-semibold px-6 py-2 rounded-xl shadow hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+              >
+                لا
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
