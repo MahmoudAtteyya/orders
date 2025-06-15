@@ -74,6 +74,7 @@ function DownloadPage() {
         throw new Error('فشل في إعادة الضبط');
       }
       setOrdersCount(0); // تصفير العداد بعد إعادة الضبط
+      await fetchOrdersCount(); // تحديث العدد من السيرفر
       alert('تم مسح جميع الطلبات بنجاح');
     } catch (error) {
       alert('حدث خطأ أثناء إعادة الضبط');
