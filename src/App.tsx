@@ -313,8 +313,8 @@ function App() {
           <div className="flex items-center gap-2">
             <span className="font-bold text-purple-700">Elliaa</span>
             <span className="text-gray-400">|</span>
-            <span>Made with</span>
             <span className="mx-1 animate-pulse text-red-500 text-xl">❤</span>
+            <span>Made with</span>
           </div>
           <div className="text-xs text-gray-400 mt-1">All rights reserved © {new Date().getFullYear()}</div>
         </footer>
