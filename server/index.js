@@ -110,8 +110,13 @@ function clearOrders() {
 }
 
 // Check orders endpoint
-app.get('/orders', (req, res) => {
-    res.json({ orders, count: orders.length });
+app.get('/orders', async (req, res) => {
+  try {
+    const count = await Order.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching orders count' });
+  }
 });
 
 // Add order endpoint
