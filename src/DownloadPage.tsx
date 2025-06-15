@@ -1,9 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FileText } from 'lucide-react'
 
 function DownloadPage() {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [ordersCount, setOrdersCount] = useState<number | null>(null);
+
+  // جلب عدد الطلبات من السيرفر
+  const fetchOrdersCount = async () => {
+    try {
+      const response = await fetch('/orders');
+      const data = await response.json();
+      setOrdersCount(data.count);
+    } catch {
+      setOrdersCount(null);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) fetchOrdersCount();
+  }, [isAuthenticated]);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +58,7 @@ function DownloadPage() {
       if (!response.ok) {
         throw new Error('فشل في إعادة الضبط');
       }
+      setOrdersCount(0); // تصفير العداد بعد إعادة الضبط
       alert('تم مسح جميع الطلبات بنجاح');
     } catch (error) {
       alert('حدث خطأ أثناء إعادة الضبط');
@@ -102,6 +119,14 @@ function DownloadPage() {
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
+          <div className="mb-6">
+            <label className="block text-lg font-semibold text-gray-700 mb-2 text-center">عدد الطلبات</label>
+            <div className="w-full flex items-center justify-center">
+              <div className="bg-purple-50 border border-purple-200 rounded-xl px-6 py-4 text-2xl font-bold text-purple-700 shadow-sm min-w-[120px] text-center">
+                {ordersCount === null ? '...' : ordersCount}
+              </div>
+            </div>
+          </div>
           <button
             onClick={handleDownload}
             className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold py-4 px-6 rounded-xl hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl mb-4"
