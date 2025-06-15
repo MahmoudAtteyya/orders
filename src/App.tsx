@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ShoppingCart, User, Phone, FileText, MapPin, Building2 } from 'lucide-react';
 
 // Toast component
@@ -146,6 +146,10 @@ function App() {
       showToast('لا يوجد طلبات في الوقت الحالي', 'info');
     }
   };
+
+  useEffect(() => {
+    document.title = 'طلب جديد - إيلياء';
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -337,7 +341,7 @@ function App() {
           <div className="flex items-center gap-2">
             <span className="font-bold text-purple-700">Elliaa</span>
             <span className="text-gray-400">|</span>
-            {/* Animated SVG Heart - smaller, new color */}
+            {/* Animated SVG Heart - slower animation, red color */}
             <span className="inline-block">
               <svg
                 className="w-5 h-5 animate-heartbeat drop-shadow-lg"
@@ -347,8 +351,8 @@ function App() {
               >
                 <path
                   d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                  fill="#6a1b9a"
-                  stroke="#6a1b9a"
+                  fill="#e53935"
+                  stroke="#e53935"
                   strokeWidth="1"
                 />
               </svg>
@@ -359,8 +363,8 @@ function App() {
         </footer>
         <style>{`
           @keyframes heartbeat {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px #a8324a44); }
-            10% { transform: scale(1.18); filter: drop-shadow(0 0 16px #a8324a88); }
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px #e5393544); }
+            10% { transform: scale(1.18); filter: drop-shadow(0 0 16px #e5393588); }
             20% { transform: scale(0.95); }
             30% { transform: scale(1.12); }
             50% { transform: scale(0.97); }
@@ -368,7 +372,7 @@ function App() {
             80% { transform: scale(0.98); }
           }
           .animate-heartbeat {
-            animation: heartbeat 1.3s infinite cubic-bezier(.4,0,.6,1);
+            animation: heartbeat 2.2s infinite cubic-bezier(.4,0,.6,1);
             transition: filter 0.2s;
           }
           .animate-fade-in {
