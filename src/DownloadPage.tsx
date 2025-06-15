@@ -35,6 +35,20 @@ function DownloadPage() {
     }
   };
 
+  const handleReset = async () => {
+    if (!window.confirm('هل أنت متأكد أنك تريد مسح جميع الطلبات؟')) return;
+    try {
+      const response = await fetch('/api/reset-orders', { method: 'POST' });
+      if (!response.ok) {
+        throw new Error('فشل في إعادة الضبط');
+      }
+      alert('تم مسح جميع الطلبات بنجاح');
+    } catch (error) {
+      alert('حدث خطأ أثناء إعادة الضبط');
+      console.error('Error:', error);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -89,11 +103,19 @@ function DownloadPage() {
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
           <button
             onClick={handleDownload}
-            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold py-4 px-6 rounded-xl hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold py-4 px-6 rounded-xl hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl mb-4"
           >
             <span className="flex items-center justify-center">
               <FileText className="w-5 h-5 mr-2" />
               تحميل الطلبات
+            </span>
+          </button>
+          <button
+            onClick={handleReset}
+            className="w-full bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold py-4 px-6 rounded-xl hover:from-red-600 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
+            <span className="flex items-center justify-center">
+              إعادة الضبط
             </span>
           </button>
         </div>
@@ -102,4 +124,4 @@ function DownloadPage() {
   );
 }
 
-export default DownloadPage; 
+export default DownloadPage;

@@ -28,6 +28,28 @@ if (!fs.existsSync(exportsDir)) {
     fs.mkdirSync(exportsDir);
 }
 
+// File to persist orders
+const ordersFile = path.join(exportsDir, 'orders.json');
+
+// Load orders from file if exists
+function loadOrders() {
+  if (fs.existsSync(ordersFile)) {
+    try {
+      const data = fs.readFileSync(ordersFile, 'utf8');
+      orders = JSON.parse(data) || [];
+    } catch (e) {
+      orders = [];
+    }
+  } else {
+    orders = [];
+  }
+}
+
+// Save orders to file
+function saveOrders() {
+  fs.writeFileSync(ordersFile, JSON.stringify(orders, null, 2));
+}
+
 // Save counter to file
 const saveCounter = () => {
     fs.writeFileSync(counterFile, downloadCounter.toString());
@@ -53,6 +75,7 @@ if (fs.existsSync(counterFile)) {
 clearExportsDirectory();
 downloadCounter = 1;
 saveCounter();
+loadOrders();
 
 // Function to clear orders array
 function clearOrders() {
@@ -96,6 +119,7 @@ app.post('/api/add-order', (req, res) => {
 
     // Add order to array
     orders.push(order);
+    saveOrders();
     console.log('Received order:', req.body);
     console.log('Current orders:', orders);
 
@@ -112,12 +136,8 @@ app.get('/api/download', async (req, res) => {
     if (orders.length === 0) {
       return res.status(404).json({ error: 'No orders to download' });
     }
-
-    console.log('Downloading orders:', orders);
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Orders');
-
-    // Define columns with their keys and widths
     worksheet.columns = [
       { header: 'Package_Serial', key: 'Package_Serial', width: 20 },
       { header: 'Description', key: 'Description', width: 30 },
@@ -135,26 +155,12 @@ app.get('/api/download', async (req, res) => {
       { header: 'HasPOD', key: 'HasPOD', width: 10 },
       { header: 'SellerName', key: 'SellerName', width: 20 }
     ];
-
-    // Add rows to the worksheet
     worksheet.addRows(orders);
-
-    // Generate unique file name
     const fileName = `Orders_${downloadCounter}.xlsx`;
     const filePath = path.join(exportsDir, fileName);
-
-    // Save the workbook
     await workbook.xlsx.writeFile(filePath);
-    console.log('File written successfully');
-
-    // Clear orders array after successful file generation
-    clearOrders();
-    console.log('Orders array cleared after download');
-
-    // Increment counter and save
     downloadCounter++;
     saveCounter();
-
     res.download(filePath, fileName, (err) => {
       if (err) {
         console.error('Error sending file:', err);
@@ -165,6 +171,13 @@ app.get('/api/download', async (req, res) => {
     console.error('Error generating Excel file:', error);
     res.status(500).send('Error generating Excel file');
   }
+});
+
+// Reset orders endpoint
+app.post('/api/reset-orders', (req, res) => {
+  orders = [];
+  saveOrders();
+  res.json({ message: 'Orders have been reset.' });
 });
 
 // Handle API routes first
