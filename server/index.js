@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import mongoose from 'mongoose';
+const cron = require('node-cron');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -289,6 +290,28 @@ app.use('/api', express.Router());
 // Send index.html for all other routes (SPA support)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
+
+// Reset عداد اليوم عند منتصف الليل كل يوم
+cron.schedule('0 0 * * *', async () => {
+  try {
+    await Stats.updateOne({}, { dailyCount: 0 });
+    console.log('Daily count reset');
+  } catch (e) { console.error('Error resetting daily count:', e); }
+});
+// Reset عداد الشهر عند بداية كل شهر
+cron.schedule('0 0 1 * *', async () => {
+  try {
+    await Stats.updateOne({}, { monthlyCount: 0 });
+    console.log('Monthly count reset');
+  } catch (e) { console.error('Error resetting monthly count:', e); }
+});
+// Reset عداد السنة عند بداية كل سنة
+cron.schedule('0 0 1 1 *', async () => {
+  try {
+    await Stats.updateOne({}, { yearlyCount: 0 });
+    console.log('Yearly count reset');
+  } catch (e) { console.error('Error resetting yearly count:', e); }
 });
 
 app.listen(port, () => {
